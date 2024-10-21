@@ -4,8 +4,7 @@
 #include <string.h>
 #define FNV_OFFSET_BASIS 2166136261u
 #define FNV_PRIME 16777619u
-
-const int table_size = 100000;
+#define TABLE_SIZE 100000
 
 typedef struct entry {
     void *data;
@@ -30,16 +29,16 @@ u_int32_t hash_func(const char *key) {
     return hash;
 }
 
-entry *table[table_size] = {};
+entry *table[TABLE_SIZE] = {};
 
 void init(void) {
-    for (int i = 0; i < table_size; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
         table[i] = NULL;
     }
 }
 
 void print_table(void (print_data_func)(void *)) {
-    for (int i = 0; i < table_size; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
         const entry *entry = table[i];
         if (entry == NULL) {
             continue;
@@ -57,7 +56,7 @@ void print_table(void (print_data_func)(void *)) {
 }
 
 entry *create_entry(void *data, u_int32_t (hash_func)(const char*), char* key) {
-    const int index = hash_func(key) % table_size;
+    const int index = hash_func(key) % TABLE_SIZE;
     entry *new = malloc(sizeof(*new));
     new->data = data;
     new->key = key;
@@ -73,7 +72,7 @@ entry *create_entry(void *data, u_int32_t (hash_func)(const char*), char* key) {
 }
 
 entry *get_entry(const char *key, u_int32_t (hash_func)(const char *)) {
-    const int index = hash_func(key) % table_size;
+    const int index = hash_func(key) % TABLE_SIZE;
     entry *temp = table[index];
 
     while (temp != NULL && strcmp(temp->key, key) != 0) {
@@ -88,7 +87,7 @@ entry *get_entry(const char *key, u_int32_t (hash_func)(const char *)) {
 }
 
 void delete_entry(const char *key, u_int32_t (hash_func)(const char *)) {
-    const int index = hash_func(key) % table_size;
+    const int index = hash_func(key) % TABLE_SIZE;
     entry *temp = table[index];
     entry *prev = NULL;
 
@@ -134,7 +133,7 @@ float collision_rate(void) {
     float collions = 0;
     float no_collions = 0;
 
-    for (int i = 0; i < table_size; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
         if (table[i] != NULL && table[i]->next != NULL) {
             collions++;
         } else if (table[i] != NULL && table[i]->next == NULL) {
